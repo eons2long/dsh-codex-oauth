@@ -1,6 +1,6 @@
 {
   "name": "dsh-codex-oauth",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Use a ChatGPT Codex subscription in DeepSeek Harness through standalone OAuth",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
   },
   "keywords": ["dsh-plugin", "deepseek-harness", "openai-codex", "oauth"],
   "license": "MIT",
-  "scripts": { "test": "node test/smoke.mjs" },
+  "scripts": { "build": "node scripts/build-client.mjs", "test": "npm run build && node test/smoke.mjs && node test/web-auth.mjs" },
   "type": "module",
   "main": "lib/index.js",
   "bin": { "dsh-openai-codex": "bin/dsh-openai-codex.js" },
@@ -25,6 +25,7 @@
       "platform": "web"
     }
   },
+  "devDependencies": { "esbuild": "^0.28.2" },
   "peerDependencies": {
     "@earendil-works/pi-ai": "^0.84.1",
     "@deepseek-ai/cordis": "^4.0.1",

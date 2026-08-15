@@ -74,6 +74,8 @@ dsh plugin --profile web exec dsh-openai-codex logout
 npm test
 ```
 
+`npm test` 会先重新构建 Web bundle，再运行基础检查。
+
 测试需要当前 DSH profile 提供 DSH 和 `pi-ai` peer dependencies。
 
 ## 限制

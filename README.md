@@ -61,6 +61,8 @@ The default is `~/.dsh/.openai-codex-auth.json`. The file is written atomically 
 npm test
 ```
 
+`npm test` rebuilds the Web bundle before running the smoke checks.
+
 The test requires the DSH and `pi-ai` peer dependencies supplied by a DSH profile.
 
 ## Limitations

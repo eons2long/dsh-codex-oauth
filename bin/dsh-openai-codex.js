@@ -2,6 +2,7 @@
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline/promises";
 import { authPath, login, logout, status } from "../lib/auth.js";
+import { safeMessage } from "../lib/safe-message.js";
 
 function openBrowser(raw) {
   const url = new URL(raw);
@@ -9,11 +10,6 @@ function openBrowser(raw) {
   const command = process.platform === "darwin" ? ["open", url.href] : process.platform === "win32" ? ["rundll32.exe", "url.dll,FileProtocolHandler", url.href] : ["xdg-open", url.href];
   const child = spawn(command[0], command.slice(1), { detached: true, stdio: "ignore", windowsHide: true });
   child.on("error", () => {}); child.unref();
-}
-function safeMessage(error) {
-  return String(error?.message ?? error)
-    .replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu, "[redacted token]")
-    .replace(/(\b(?:code|token|refresh_token|access_token)=)[^&\s]+/giu, "$1[redacted]");
 }
 function help() {
   console.log("Usage: dsh-openai-codex <login|logout|status> [--device-code]");

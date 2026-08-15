@@ -8,7 +8,7 @@ const h = React.createElement;
 async function request(path, method = "GET") {
   const response = await fetch(path, { method, credentials: "same-origin", headers: { accept: "application/json" } });
   const value = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(value.error || `HTTP ${response.status}`);
+  if (!response.ok) throw new Error(value && typeof value === "object" && typeof value.error === "string" ? value.error : `HTTP ${response.status}`);
   return value;
 }
 
@@ -22,11 +22,18 @@ function CodexSettings() {
     const timer = setInterval(refresh, 1000);
     return () => clearInterval(timer);
   }, [refresh, state.status]);
-  const signIn = () => {
+  const signIn = async () => {
+    const popup = window.open("about:blank", "_blank");
+    if (!popup) { setState({ status: "error", message: "Please allow popups to sign in" }); return; }
+    popup.opener = null;
     setBusy(true); setState({ status: "signing-in" });
-    const popup = window.open(LOGIN, "_blank", "noopener,noreferrer");
-    if (!popup) { setBusy(false); setState({ status: "error", message: "Please allow popups to sign in" }); }
-    else setTimeout(() => setBusy(false), 500);
+    try {
+      const challenge = await request(LOGIN, "POST");
+      popup.location.replace(challenge.url);
+    } catch (error) {
+      popup?.close();
+      setState({ status: "error", message: error.message });
+    } finally { setBusy(false); }
   };
   const signOut = async () => { setBusy(true); try { await request(LOGOUT, "POST"); setState({ status: "signed-out" }); } catch (error) { setState({ status: "error", message: error.message }); } finally { setBusy(false); } };
   const signedIn = state.status === "signed-in";

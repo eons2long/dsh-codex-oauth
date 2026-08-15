@@ -1,3 +1,6 @@
 node_modules/
 *.tgz
+.openai-codex-auth.json
+.openai-codex-auth.json.lock
+.openai-codex-auth.json.*.tmp
 .DS_Store
