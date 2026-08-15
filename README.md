@@ -3,17 +3,19 @@
 DSH adapter that uses the same OpenAI Codex OAuth credential as Pi:
 `~/.pi/agent/auth.json` → `openai-codex`.
 
-It uses Pi's installed `@earendil-works/pi-ai` Codex provider, including the official
-Codex Responses transport and OAuth refresh. It does not copy the token into an
-API-key environment variable.
+It uses Pi's installed `@earendil-works/pi-ai` Codex provider and DSH's public
+`dsh-llm-pi-ai` adapter, including the official Codex Responses transport, images,
+tool calls, reasoning replay, compaction, and OAuth refresh. It does not copy the
+token into an API-key environment variable.
 
 ## Install
 
 ```bash
-npm install --prefix ~/.dsh/profiles/web dsh-llm-codex-oauth
+dsh plugin --profile web add dsh-llm-codex-oauth
 ```
 
-Add this entry to the active DSH profile's `cordis.patch.yml`:
+For a manual profile install, add the package to the profile and include this
+entry in its `cordis.patch.yml`:
 
 ```yaml
 - insert:
@@ -31,8 +33,11 @@ Then select provider `openai-codex` in the model picker.
 
 ## Scope
 
-Text, reasoning, tool calls, streaming, token refresh, and the model catalog are
-covered. Images and durable replay metadata are intentionally not added in this
-first version; use a new session after switching to this provider.
+The plugin delegates message conversion, streaming, image attachments, tool calls,
+reasoning replay, and compaction to DSH's public `dsh-llm-pi-ai` adapter. It only
+bridges the credential store to Pi's existing OAuth document.
 
-The plugin only reads/writes the existing Pi auth file and never prints tokens.
+The plugin reads/writes `~/.pi/agent/auth.json` and never prints token values.
+Because Pi and DSH do not share a cross-application lock, avoid starting both at the
+same time while an OAuth refresh may occur; a future version may use a separate DSH
+credential file and its own login flow to remove that race.
