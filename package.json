@@ -1,19 +1,22 @@
 {
-  "name": "dsh-llm-codex-oauth",
-  "version": "0.1.0",
+  "name": "dsh-codex-oauth",
+  "version": "0.1.1",
   "description": "Use Pi's OpenAI Codex OAuth subscription in DeepSeek Harness",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eons2long/dsh-llm-codex-oauth.git"
+    "url": "git+https://github.com/eons2long/dsh-codex-oauth.git"
   },
-  "homepage": "https://github.com/eons2long/dsh-llm-codex-oauth#readme",
+  "homepage": "https://github.com/eons2long/dsh-codex-oauth#readme",
   "bugs": {
-    "url": "https://github.com/eons2long/dsh-llm-codex-oauth/issues"
+    "url": "https://github.com/eons2long/dsh-codex-oauth/issues"
   },
+  "keywords": ["dsh-plugin", "deepseek-harness", "openai-codex", "oauth"],
+  "license": "MIT",
+  "scripts": { "test": "node test/smoke.mjs" },
   "type": "module",
   "main": "lib/index.js",
   "exports": { ".": "./lib/index.js" },
-  "files": ["lib", "cordis.patch.yml", "README.md"],
+  "files": ["lib", "cordis.patch.yml", "README.md", "README.zh.md", "LICENSE"],
   "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
   "peerDependencies": {
     "@earendil-works/pi-ai": "^0.84.1",
