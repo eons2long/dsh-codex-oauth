@@ -1,6 +1,6 @@
 {
   "name": "dsh-codex-oauth",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Use a ChatGPT Codex subscription in DeepSeek Harness through standalone OAuth",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
   "type": "module",
   "main": "lib/index.js",
   "bin": { "dsh-openai-codex": "bin/dsh-openai-codex.js" },
-  "exports": { ".": "./lib/index.js", "./client": "./lib/client.js", "./cordis.patch.yml": "./cordis.patch.yml" },
+  "exports": { ".": "./lib/index.js", "./client": "./lib/client.js", "./cordis.patch.yml": "./cordis.patch.yml", "./package.json": "./package.json" },
   "files": ["lib", "bin", "client", "cordis.patch.yml", "README.md", "README.zh.md", "SPEC.md", "LICENSE"],
   "dsh": {
     "bundle": { "patch": "./cordis.patch.yml" },
