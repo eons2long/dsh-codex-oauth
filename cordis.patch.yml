@@ -1,0 +1,3 @@
+- insert:
+    - id: llm-codex-oauth
+      name: dsh-llm-codex-oauth
