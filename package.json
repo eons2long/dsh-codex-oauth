@@ -1,6 +1,6 @@
 {
   "name": "dsh-codex-oauth",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Use a ChatGPT Codex subscription in DeepSeek Harness through standalone OAuth",
   "repository": {
     "type": "git",

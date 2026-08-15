@@ -22,12 +22,11 @@ function CodexSettings() {
     const timer = setInterval(refresh, 1000);
     return () => clearInterval(timer);
   }, [refresh, state.status]);
-  const signIn = async () => {
+  const signIn = () => {
     setBusy(true); setState({ status: "signing-in" });
-    const popup = window.open("about:blank", "_blank", "noopener,noreferrer");
-    try { const challenge = await request(LOGIN, "POST"); if (!popup) throw new Error("Please allow popups to sign in"); popup.location.replace(challenge.url); }
-    catch (error) { popup?.close(); setState({ status: "error", message: error.message }); }
-    finally { setBusy(false); }
+    const popup = window.open(LOGIN, "_blank", "noopener,noreferrer");
+    if (!popup) { setBusy(false); setState({ status: "error", message: "Please allow popups to sign in" }); }
+    else setTimeout(() => setBusy(false), 500);
   };
   const signOut = async () => { setBusy(true); try { await request(LOGOUT, "POST"); setState({ status: "signed-out" }); } catch (error) { setState({ status: "error", message: error.message }); } finally { setBusy(false); } };
   const signedIn = state.status === "signed-in";
