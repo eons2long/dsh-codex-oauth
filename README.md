@@ -2,47 +2,68 @@
 
 [English](README.md) | [中文](README.zh.md)
 
-DSH adapter that uses the same OpenAI Codex OAuth credential as Pi:
-`~/.pi/agent/auth.json` → `openai-codex`.
+A standalone [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin for using ChatGPT Plus/Pro Codex models through OpenAI's Codex OAuth flow. Pi is **not** required.
 
-It uses Pi's installed `@earendil-works/pi-ai` Codex provider and DSH's public
-`dsh-llm-pi-ai` adapter, including the official Codex Responses transport, images,
-tool calls, reasoning replay, compaction, and OAuth refresh. It does not copy the
-token into an API-key environment variable.
+It uses the official `openaiCodexProvider` from `@earendil-works/pi-ai` and DSH's public `dsh-llm-pi-ai` adapter. It supports streaming, tool calls, reasoning, images, replay, compaction, automatic token refresh, and the Codex model catalog.
+
+This is the ChatGPT Codex backend, not a general OpenAI Platform API-key adapter.
 
 ## Install
 
 ```bash
 dsh plugin --profile web add dsh-codex-oauth
+dsh web
 ```
 
-For a manual profile install, add the package to the profile and include this
-entry in its `cordis.patch.yml`:
-
-```yaml
-- insert:
-    - id: llm-codex-oauth
-      name: dsh-codex-oauth
-```
-
-The profile must also include the normal `llm` service. Restart:
+For an `npx` installation:
 
 ```bash
+npx @deepseek-ai/dsh plugin --profile web add dsh-codex-oauth
 npx @deepseek-ai/dsh web
 ```
 
-Then select provider `openai-codex` in the model picker.
+## Sign in
 
-## Scope
+The plugin owns its own credential file and login flow. No Pi installation or token copying is needed.
 
-The plugin delegates message conversion, streaming, image attachments, tool calls,
-reasoning replay, and compaction to DSH's public `dsh-llm-pi-ai` adapter. It only
-bridges the credential store to Pi's existing OAuth document.
+### CLI
 
-The plugin reads/writes `~/.pi/agent/auth.json` and never prints token values.
-Because Pi and DSH do not share a cross-application lock, avoid starting both at the
-same time while an OAuth refresh may occur; a future version may use a separate DSH
-credential file and its own login flow to remove that race.
+```bash
+dsh plugin --profile web exec dsh-openai-codex login
+# headless machines:
+dsh plugin --profile web exec dsh-openai-codex login --device-code
+
+dsh plugin --profile web exec dsh-openai-codex status
+dsh plugin --profile web exec dsh-openai-codex logout
+```
+
+The browser login opens OpenAI's authorization page and completes through a localhost callback. `--device-code` is the fallback for machines without a usable browser.
+
+After signing in, choose `openai-codex` in the DSH model picker.
+
+### Credentials
+
+Credentials are stored at:
+
+```text
+$DSH_HOME/.openai-codex-auth.json
+```
+
+The default is `~/.dsh/.openai-codex-auth.json`. The file is written atomically with owner-only permissions, and refresh/login/logout operations use a cross-process file lock. The plugin never reads or modifies `~/.pi/agent/auth.json` or `~/.codex/auth.json`.
+
+## Development
+
+```bash
+npm test
+```
+
+The test requires the DSH and `pi-ai` peer dependencies supplied by a DSH profile.
+
+## Limitations
+
+- ChatGPT plan eligibility, model access, quotas, and backend behavior are controlled by OpenAI and may change.
+- Codex endpoints are not public OpenAI Platform API endpoints.
+- Filesystem, shell, MCP, permissions, attachments, and other DSH capabilities come from the active profile.
 
 ## License
 

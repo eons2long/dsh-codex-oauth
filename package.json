@@ -1,7 +1,7 @@
 {
   "name": "dsh-codex-oauth",
-  "version": "0.1.1",
-  "description": "Use Pi's OpenAI Codex OAuth subscription in DeepSeek Harness",
+  "version": "0.2.0",
+  "description": "Use a ChatGPT Codex subscription in DeepSeek Harness through standalone OAuth",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eons2long/dsh-codex-oauth.git"
@@ -15,8 +15,9 @@
   "scripts": { "test": "node test/smoke.mjs" },
   "type": "module",
   "main": "lib/index.js",
+  "bin": { "dsh-openai-codex": "bin/dsh-openai-codex.js" },
   "exports": { ".": "./lib/index.js" },
-  "files": ["lib", "cordis.patch.yml", "README.md", "README.zh.md", "LICENSE"],
+  "files": ["lib", "bin", "cordis.patch.yml", "README.md", "README.zh.md", "SPEC.md", "LICENSE"],
   "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
   "peerDependencies": {
     "@earendil-works/pi-ai": "^0.84.1",

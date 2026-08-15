@@ -2,71 +2,67 @@
 
 [English](README.md) | 中文
 
-让 [DeepSeek Harness（dsh）](https://github.com/deepseek-ai/deepseek-harness)
-复用 Pi 已登录的 ChatGPT Plus/Pro Codex OAuth，在不使用 OpenAI Platform API Key 的情况下调用 `openai-codex` 模型。
+一个独立的 [DeepSeek Harness（dsh）](https://github.com/deepseek-ai/deepseek-harness) 插件，通过 OpenAI Codex OAuth 使用 ChatGPT Plus/Pro 订阅模型。
 
-本插件不是普通的 OpenAI API 适配器，也不会把 ChatGPT 订阅变成通用 API 凭据。它使用 Pi 的 Codex provider、官方 Codex Responses 传输和 DSH 公共的 `dsh-llm-pi-ai` 适配器。
+**不需要安装 Pi。** 插件使用 `@earendil-works/pi-ai` 提供的 Codex provider，以及 DSH 公共的 `dsh-llm-pi-ai` 适配器，支持流式输出、工具调用、推理、图片、replay、上下文压缩、OAuth 自动刷新和 Codex 模型目录。
 
-## 功能
-
-- 复用 `~/.pi/agent/auth.json` 中的 `openai-codex` OAuth 凭据；
-- access token 过期时自动使用 refresh token 更新；
-- 使用 Pi 同款 Codex 模型目录；
-- 支持流式输出、工具调用、推理、图片输入、replay 和上下文压缩；
-- 不读取或打印 API Key，也不会把 token 放进环境变量。
+这是 ChatGPT Codex 后端接入，不是普通的 OpenAI Platform API Key 适配器。
 
 ## 安装
-
-将插件安装到 dsh 的 `web` profile：
 
 ```bash
 dsh plugin --profile web add dsh-codex-oauth
 dsh web
 ```
 
-如果使用的是 `npx` 版本：
+如果使用 `npx`：
 
 ```bash
 npx @deepseek-ai/dsh plugin --profile web add dsh-codex-oauth
 npx @deepseek-ai/dsh web
 ```
 
-启动后，在模型选择器中选择：
+## 登录
+
+插件拥有独立的 OAuth 登录流程和凭据文件。新用户不需要安装 Pi，也不需要复制任何 token。
+
+### 命令行登录
+
+```bash
+dsh plugin --profile web exec dsh-openai-codex login
+```
+
+无图形浏览器的机器：
+
+```bash
+dsh plugin --profile web exec dsh-openai-codex login --device-code
+```
+
+查看状态和退出登录：
+
+```bash
+dsh plugin --profile web exec dsh-openai-codex status
+dsh plugin --profile web exec dsh-openai-codex logout
+```
+
+浏览器登录会打开 OpenAI 授权页面，并通过 localhost 回调完成。登录后，在 DSH 模型选择器中选择 `openai-codex`。
+
+### 凭据存储
+
+凭据默认存储在：
 
 ```text
-Provider: openai-codex
+~/.dsh/.openai-codex-auth.json
 ```
 
-也可以手动把下面的条目加入 profile 的 `cordis.patch.yml`：
+也可以通过 `DSH_HOME` 改变目录。文件采用原子写入、仅所有者可读写（`0600`），登录、刷新和退出登录使用跨进程文件锁。
 
-```yaml
-- insert:
-    - id: llm-codex-oauth
-      name: dsh-codex-oauth
-```
-
-## 前置条件
-
-Pi 必须已经完成 OpenAI Codex 登录，并且存在：
+插件**不会**读取或修改：
 
 ```text
 ~/.pi/agent/auth.json
+~/.codex/auth.json
 ```
-
-文件中应有 `openai-codex` OAuth 条目。插件不会替用户登录，也不会要求复制 token。
-
-## 凭据与并发注意事项
-
-插件只使用 Pi 的现有凭据文件，并会在 OAuth 刷新后写回该文件。Pi 与 DSH 并不共享同一个跨应用锁，因此在 token 可能刷新时，不建议同时运行 Pi 和 DSH。
-
-卸载插件不会删除 Pi 的登录凭据。若要退出登录，请通过 Pi 自己的 `/logout` 完成。
-
-## 限制
-
-- ChatGPT 订阅权限、模型目录、配额和 Codex 后端行为由 OpenAI 控制，可能变化；
-- 插件依赖 DSH 的公共 `dsh-llm-pi-ai` 适配器，需与当前 DSH 版本兼容；
-- 这是 Codex 后端接入，不是公开的 OpenAI Platform API；
-- DSH 的其他能力（文件系统、Shell、MCP、权限、附件等）仍由当前 profile 提供。
 
 ## 开发与测试
 
@@ -74,7 +70,13 @@ Pi 必须已经完成 OpenAI Codex 登录，并且存在：
 npm test
 ```
 
-测试需要 DSH 和 Pi 的依赖已经安装或由 DSH profile 提供。
+测试需要当前 DSH profile 提供 DSH 和 `pi-ai` peer dependencies。
+
+## 限制
+
+- ChatGPT 套餐资格、模型权限、配额和后端行为由 OpenAI 控制，可能变化；
+- Codex 端点不是公开的 OpenAI Platform API 端点；
+- 文件系统、Shell、MCP、权限、附件等能力仍由当前 DSH profile 提供。
 
 ## 许可证
 
