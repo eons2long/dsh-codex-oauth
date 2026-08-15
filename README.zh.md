@@ -26,6 +26,10 @@ npx @deepseek-ai/dsh web
 
 插件拥有独立的 OAuth 登录流程和凭据文件。新用户不需要安装 Pi，也不需要复制任何 token。
 
+### Web UI
+
+打开 **设置 → OpenAI Codex**，点击 **使用 ChatGPT 登录**。插件会打开浏览器完成 OAuth 授权；返回 DSH 后，在模型选择器中选择 `openai-codex`。
+
 ### 命令行登录
 
 ```bash

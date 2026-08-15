@@ -26,6 +26,10 @@ npx @deepseek-ai/dsh web
 
 The plugin owns its own credential file and login flow. No Pi installation or token copying is needed.
 
+### Web UI
+
+Open **Settings → OpenAI Codex** and click **Sign in with ChatGPT**. A browser window opens for the OAuth approval; after it completes, return to DSH and select `openai-codex` in the model picker.
+
 ### CLI
 
 ```bash
