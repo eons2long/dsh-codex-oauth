@@ -45,7 +45,7 @@ function CodexSettings() {
       h("span", null, label),
       state.status === "loading" ? null : h("button", { type: "button", disabled: busy || state.status === "signing-in", onClick: signedIn ? signOut : signIn }, signedIn ? "退出登录" : "使用 ChatGPT 登录")),
     state.status === "error" ? h("p", { style: { color: "var(--dsw-alias-state-error-primary)" } }, state.message) : null,
-    h("p", { style: { margin: 0, color: "var(--dsw-alias-label-secondary)", fontSize: 13 } }, "凭据保存在 DSH_HOME/.openai-codex-auth.json，不会读取 Pi 或 Codex CLI 的登录文件。"));
+  );
 }
 
 export const name = "dsh-codex-oauth-client";

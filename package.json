@@ -1,6 +1,6 @@
 {
   "name": "dsh-codex-oauth",
-  "version": "0.2.6",
+  "version": "0.2.8",
   "description": "Use a ChatGPT Codex subscription in DeepSeek Harness through standalone OAuth",
   "repository": {
     "type": "git",
@@ -29,8 +29,8 @@
   "peerDependencies": {
     "@earendil-works/pi-ai": "^0.84.1",
     "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-atomic-write": "^0.1.0-rc.6",
-    "@deepseek-ai/dsh-llm": "^0.1.0-rc.6",
-    "@deepseek-ai/dsh-llm-pi-ai": "^0.1.0-rc.6"
+    "@deepseek-ai/dsh-atomic-write": "^0.1.1-rc.2",
+    "@deepseek-ai/dsh-llm": "^0.1.1-rc.2",
+    "@deepseek-ai/dsh-llm-pi-ai": "^0.1.1-rc.2"
   }
 }
