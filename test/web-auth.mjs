@@ -19,6 +19,11 @@ async function call(path) {
   await handlers.get(path)(request, { writeHead(status, headers) { result = { status, headers }; }, end(body) { result.body = body; } });
   return result;
 }
+request.headers.host = "attacker.example:3080";
+request.headers.origin = "http://attacker.example:3080";
+assert.equal((await call(AUTH_LOGIN_PATH)).status, 403);
+request.headers.host = "127.0.0.1:3080";
+request.headers.origin = "http://127.0.0.1:3080";
 assert.equal((await call(AUTH_LOGIN_PATH)).status, 200);
 assert.equal((await call(AUTH_LOGOUT_PATH)).status, 200);
 assert.equal((await call(AUTH_LOGIN_PATH)).status, 200);
