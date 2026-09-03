@@ -29,10 +29,26 @@ const store = new CodexCredentialStore(filename);
 const credential = { type: "oauth", access: "access", refresh: "refresh", expires: Date.now() + 60_000, accountId: "account" };
 await store.modify(OPENAI_CODEX_PROVIDER, () => credential);
 assert.deepEqual(await store.read(OPENAI_CODEX_PROVIDER), credential);
+let firstHasLock;
+const firstLockHeld = new Promise((resolve) => { firstHasLock = resolve; });
+const firstCredential = { type: "oauth", access: "first-access", refresh: "first-refresh", expires: Date.now() + 60_000, accountId: "first-account" };
+const secondCredential = { type: "oauth", access: "second-access", refresh: "second-refresh", expires: Date.now() + 60_000, accountId: "second-account" };
+const firstWrite = store.modify(OPENAI_CODEX_PROVIDER, async () => {
+  firstHasLock();
+  await new Promise((resolve) => setTimeout(resolve, 2_500));
+  return firstCredential;
+});
+await firstLockHeld;
+const secondWrite = store.modify(OPENAI_CODEX_PROVIDER, (current) => {
+  assert.deepEqual(current, firstCredential);
+  return secondCredential;
+});
+await Promise.all([firstWrite, secondWrite]);
+assert.deepEqual(await store.read(OPENAI_CODEX_PROVIDER), secondCredential);
 assert.equal((await stat(filename)).mode & 0o777, 0o600);
 assert.equal((await stat(root)).mode & 0o777, 0o700);
 await chmod(root, 0o755);
-assert.deepEqual(await store.read(OPENAI_CODEX_PROVIDER), credential);
+assert.deepEqual(await store.read(OPENAI_CODEX_PROVIDER), secondCredential);
 assert.equal((await stat(root)).mode & 0o777, 0o700);
 await chmod(filename, 0o644);
 await assert.rejects(() => store.read(OPENAI_CODEX_PROVIDER), /owner-only/);
