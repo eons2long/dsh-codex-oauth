@@ -4,7 +4,7 @@
 
 一个独立的 [DeepSeek Harness（dsh）](https://github.com/deepseek-ai/deepseek-harness) 插件，通过 OpenAI Codex OAuth 使用 ChatGPT Plus/Pro 订阅模型。
 
-**不需要安装 Pi。** 插件使用 `@earendil-works/pi-ai` 提供的 Codex provider，以及 DSH 公共的 `dsh-llm-pi-ai` 适配器，支持流式输出、工具调用、推理、图片、replay、上下文压缩、OAuth 自动刷新和 Codex 模型目录。
+插件使用 `@earendil-works/pi-ai` 提供的 Codex provider，以及 DSH 公共的 `dsh-llm-pi-ai` 适配器，支持流式输出、工具调用、推理、图片、replay、上下文压缩、OAuth 自动刷新和 Codex 模型目录。
 
 这是 ChatGPT Codex 后端接入，不是普通的 OpenAI Platform API Key 适配器。
 

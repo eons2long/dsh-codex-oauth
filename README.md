@@ -2,7 +2,7 @@
 
 [English](README.md) | [中文](README.zh.md)
 
-A standalone [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin for using ChatGPT Plus/Pro Codex models through OpenAI's Codex OAuth flow. Pi is **not** required.
+A standalone [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin for using ChatGPT Plus/Pro Codex models through OpenAI's Codex OAuth flow.
 
 It uses the official `openaiCodexProvider` from `@earendil-works/pi-ai` and DSH's public `dsh-llm-pi-ai` adapter. It supports streaming, tool calls, reasoning, images, replay, compaction, automatic token refresh, and the Codex model catalog.
 
