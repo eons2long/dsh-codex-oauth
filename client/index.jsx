@@ -37,13 +37,13 @@ function CodexSettings() {
   };
   const signOut = async () => { setBusy(true); try { await request(LOGOUT, "POST"); setState({ status: "signed-out" }); } catch (error) { setState({ status: "error", message: error.message }); } finally { setBusy(false); } };
   const signedIn = state.status === "signed-in";
-  const label = state.status === "signed-in" ? "已登录" : state.status === "signing-in" ? "等待浏览器完成登录…" : state.status === "loading" ? "检查登录状态…" : state.status === "error" ? "登录失败" : "未登录";
+  const label = state.status === "signed-in" ? "Signed in" : state.status === "signing-in" ? "Waiting for the browser to finish signing in…" : state.status === "loading" ? "Checking sign-in status…" : state.status === "error" ? "Sign-in failed" : "Signed out";
   return h("section", { style: { display: "flex", flexDirection: "column", gap: 12, maxWidth: 640 } },
     h("h2", { style: { margin: 0 } }, "OpenAI Codex"),
-    h("p", { style: { margin: 0, color: "var(--dsw-alias-label-secondary)" } }, "使用 ChatGPT Plus/Pro 的 Codex 订阅，无需 OpenAI API Key。"),
+    h("p", { style: { margin: 0, color: "var(--dsw-alias-label-secondary)" } }, "Use Codex with a ChatGPT Plus/Pro subscription; no OpenAI API key is required."),
     h("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: 16, border: "1px solid var(--dsw-alias-border-l2)", borderRadius: 10 } },
       h("span", null, label),
-      state.status === "loading" ? null : h("button", { type: "button", disabled: busy || state.status === "signing-in", onClick: signedIn ? signOut : signIn }, signedIn ? "退出登录" : "使用 ChatGPT 登录")),
+      state.status === "loading" ? null : h("button", { type: "button", disabled: busy || state.status === "signing-in", onClick: signedIn ? signOut : signIn }, signedIn ? "Sign out" : "Sign in with ChatGPT")),
     state.status === "error" ? h("p", { style: { color: "var(--dsw-alias-state-error-primary)" } }, state.message) : null,
   );
 }

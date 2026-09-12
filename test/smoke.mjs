@@ -16,6 +16,15 @@ const models = await adapter.listModels("openai-codex");
 assert.ok(models.length > 0);
 assert.ok(models.some((model) => model.id === "gpt-5.6-luna"));
 const profile = [...adapter.config.profiles().values()][0];
+assert.deepEqual({
+  maxRequestImageBytes: profile.maxRequestImageBytes,
+  requestImagePixelBudget: profile.requestImagePixelBudget,
+  requestImageMaxBytes: profile.requestImageMaxBytes,
+}, {
+  maxRequestImageBytes: 20 * 1024 * 1024,
+  requestImagePixelBudget: 2048 * 2048,
+  requestImageMaxBytes: 1024 * 1024,
+});
 const bearerModels = createModels();
 bearerModels.setProvider(profile.piProvider);
 assert.equal((await bearerModels.getAuth(OPENAI_CODEX_PROVIDER, { apiKey: "test-bearer" }))?.auth.apiKey, "test-bearer");
