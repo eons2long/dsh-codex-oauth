@@ -15,6 +15,9 @@ plugin.apply({
 const models = await adapter.listModels("openai-codex");
 assert.ok(models.length > 0);
 assert.ok(models.some((model) => model.id === "gpt-5.6-luna"));
+const resolvedModel = await adapter.resolveModel("openai-codex", models[0].id);
+assert.equal(resolvedModel.provider, OPENAI_CODEX_PROVIDER);
+assert.equal(resolvedModel.id, models[0].id);
 const profile = [...adapter.config.profiles().values()][0];
 const bearerModels = createModels();
 bearerModels.setProvider(profile.piProvider);
@@ -22,6 +25,8 @@ assert.equal((await bearerModels.getAuth(OPENAI_CODEX_PROVIDER, { apiKey: "test-
 const client = await readFile(new URL("../lib/client.js", import.meta.url), "utf8");
 assert.match(client, /__ModuleLoader__\.load/);
 assert.match(client, /id:"dsh-codex-oauth"/);
+assert.match(client, /disabled: busy, onClick: signedIn \|\| signingIn \? signOut : signIn/);
+assert.match(client, /signingIn \? "\\u53D6\\u6D88\\u767B\\u5F55"/);
 
 const root = await mkdtemp(join(tmpdir(), "dsh-codex-oauth-"));
 const filename = join(root, "auth.json");
