@@ -1,7 +1,7 @@
 {
   "name": "dsh-codex-oauth",
-  "version": "0.2.8",
-  "description": "Use a ChatGPT Codex subscription in DeepSeek Harness through standalone OAuth",
+  "version": "0.3.0",
+  "description": "Use ChatGPT plan models in DeepSeek Harness through native OAuth and Responses",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eons2long/dsh-codex-oauth.git"
@@ -12,12 +12,12 @@
   },
   "keywords": ["dsh-plugin", "deepseek-harness", "openai-codex", "oauth"],
   "license": "MIT",
-  "scripts": { "build": "node scripts/build-client.mjs", "test": "npm run build && node test/smoke.mjs && node test/web-auth.mjs" },
+  "scripts": { "build": "node scripts/build-client.mjs", "test": "npm run build && node test/smoke.mjs && node --test test/auth.mjs test/adapter.mjs test/web-auth.mjs test/quota.mjs", "test:live": "node scripts/verify-live.mjs" },
   "type": "module",
   "main": "lib/index.js",
   "bin": { "dsh-openai-codex": "bin/dsh-openai-codex.js" },
   "exports": { ".": "./lib/index.js", "./client": "./lib/client.js", "./cordis.patch.yml": "./cordis.patch.yml", "./package.json": "./package.json" },
-  "files": ["lib", "bin", "client", "cordis.patch.yml", "README.md", "README.zh.md", "SPEC.md", "LICENSE"],
+  "files": ["lib", "bin", "client", "scripts/patch-tui-quota-placement.mjs", "cordis.patch.yml", "README.md", "README.zh.md", "CHANGELOG.md", "SPEC.md", "LICENSE"],
   "dsh": {
     "bundle": { "patch": "./cordis.patch.yml" },
     "client": {
@@ -25,12 +25,11 @@
       "platform": "web"
     }
   },
-  "devDependencies": { "esbuild": "^0.28.2" },
+  "devDependencies": { "esbuild": "^0.28.2", "@deepseek-ai/dsh-compaction-basic": "0.2.0-rc.2" },
+  "engines": { "node": ">=22" },
   "peerDependencies": {
-    "@earendil-works/pi-ai": "^0.82.1 || ^0.84.1 || ^0.85.1",
     "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-atomic-write": "^0.1.1-rc.2 || ^0.1.7-rc.2",
-    "@deepseek-ai/dsh-llm": "^0.1.1-rc.2 || ^0.1.7-rc.2",
-    "@deepseek-ai/dsh-llm-pi-ai": "^0.1.1-rc.2 || ^0.1.7-rc.2"
+    "@deepseek-ai/dsh-atomic-write": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "^0.2.0-rc.2"
   }
 }

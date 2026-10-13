@@ -3,4 +3,5 @@ node_modules/
 .openai-codex-auth.json
 .openai-codex-auth.json.lock
 .openai-codex-auth.json.*.tmp
+.openai-codex-auth.v2.json*
 .DS_Store

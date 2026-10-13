@@ -1,46 +1,71 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { createInterface } from "node:readline/promises";
-import { authPath, login, logout, status } from "../lib/auth.js";
+import { accounts, authPath, login, logout, status } from "../lib/auth.js";
+import { CodexCredentialStore } from "../lib/store.js";
 import { safeMessage } from "../lib/safe-message.js";
 
 function openBrowser(raw) {
   const url = new URL(raw);
-  if (url.protocol !== "https:") throw new Error("Refusing to open a non-HTTPS OAuth URL");
+  if (url.origin !== "https://auth.openai.com") throw new Error("Refusing to open an unexpected OAuth URL");
   const command = process.platform === "darwin" ? ["open", url.href] : process.platform === "win32" ? ["rundll32.exe", "url.dll,FileProtocolHandler", url.href] : ["xdg-open", url.href];
   const child = spawn(command[0], command.slice(1), { detached: true, stdio: "ignore", windowsHide: true });
   child.on("error", () => {}); child.unref();
 }
 function help() {
-  console.log("Usage: dsh-openai-codex <login|logout|status> [--device-code]");
+  console.log("Usage: dsh-openai-codex login [--new-account]\n       dsh-openai-codex <logout|status|accounts>\n       dsh-openai-codex use <client-id>\n       dsh-openai-codex models [--refresh]");
 }
-
 const [action, ...flags] = process.argv.slice(2);
 if (!action || action === "--help" || action === "-h") { help(); process.exit(0); }
-if (!["login", "logout", "status"].includes(action) || flags.some((flag) => flag !== "--device-code") || (action !== "login" && flags.length)) { help(); process.exit(1); }
+if (flags.includes("--device-code")) {
+  console.error("ChatGPT plan OAuth requires browser authorization with a local callback; --device-code is unavailable. Run login on your local computer.");
+  process.exit(1);
+}
+const valid = action === "login" ? flags.length <= 1 && (!flags.length || flags[0] === "--new-account")
+  : action === "models" ? flags.length <= 1 && (!flags.length || flags[0] === "--refresh")
+  : action === "use" ? flags.length === 1 && !flags[0].startsWith("-")
+  : ["logout", "status", "accounts"].includes(action) && !flags.length;
+if (!valid) { help(); process.exit(1); }
+const store = new CodexCredentialStore();
 try {
   if (action === "status") {
-    const value = await status();
-    if (!value.authenticated) { console.log("OpenAI Codex for dsh: signed out"); process.exitCode = 1; }
-    else console.log(`OpenAI Codex for dsh: signed in; refresh is automatic`);
+    const value = await status(store);
+    if (!value.authenticated) { console.log("OpenAI Codex for dsh: signed out; run login to authorize ChatGPT plan usage"); process.exitCode = 1; }
+    else console.log(`OpenAI Codex for dsh: signed in as ${value.label}; ChatGPT plan usage ${value.planUsage ? "enabled" : "not authorized"}; refresh is automatic`);
   } else if (action === "logout") {
-    await logout(); console.log(`OpenAI Codex for dsh: signed out; removed ${authPath()}`);
-  } else {
-    const readline = createInterface({ input: process.stdin, output: process.stdout });
+    const result = await logout(store);
+    console.log("OpenAI Codex for dsh: signed out; account registration retained for later sign-in");
+    if (!result.remoteRevoked) console.log("Remote session revocation could not be confirmed. You can disconnect the app at https://chatgpt.com/settings/usage");
+  } else if (action === "accounts") {
+    const list = await accounts(store);
+    for (const account of list) console.log(`${account.active ? "*" : " "} ${account.clientId}\t${account.label}\t${account.authenticated ? "signed in" : "signed out"}`);
+    if (!list.length) console.log("No saved ChatGPT account registrations");
+  } else if (action === "use") {
+    await store.select(flags[0]);
+    console.log("Selected ChatGPT account registration");
+  } else if (action === "models") {
+    const { createCodexAdapter } = await import("../lib/adapter.js");
+    const adapter = createCodexAdapter(store);
     try {
-      await login(undefined, {
-        prompt: async (prompt) => {
-          if (prompt.type === "select") return flags.includes("--device-code") ? "device_code" : "browser";
-          return readline.question(`${prompt.message}: `, { signal: prompt.signal });
-        },
+      for (const model of await adapter.listModels("openai-codex", { refresh: flags.includes("--refresh") })) console.log(`${model.id}\t${model.name}`);
+    } finally { adapter.dispose(); }
+  } else {
+    const controller = new AbortController();
+    const cancel = () => controller.abort(new Error("Sign-in cancelled"));
+    process.once("SIGINT", cancel);
+    try {
+      const value = await login(store, {
+        signal: controller.signal,
         notify: (event) => {
-          if (event.type === "auth_url") { console.log(`Open this URL to sign in:\n${event.url}`); openBrowser(event.url); }
-          else if (event.type === "device_code") { console.log(`Open ${event.verificationUri} and enter ${event.userCode}`); openBrowser(event.verificationUri); }
-          else if (event.message) console.log(event.message);
+          if (event.type !== "auth_url") return;
+          const display = new URL(event.url);
+          display.searchParams.delete("id_token_hint");
+          console.log(`Open this URL to sign in:\n${display.href}`);
+          openBrowser(event.url);
         },
-      });
-    } finally { readline.close(); }
-    console.log(`OpenAI Codex for dsh: signed in; credentials saved to ${authPath()}`);
+      }, { newAccount: flags.includes("--new-account") });
+      console.log(`OpenAI Codex for dsh: signed in; credentials saved to ${authPath()}`);
+      console.log(value.planUsage ? "Eligible requests use your ChatGPT plan. Manage usage: https://chatgpt.com/settings/usage" : "ChatGPT plan usage was not authorized. Run login again to enable it.");
+    } finally { process.removeListener("SIGINT", cancel); }
   }
 } catch (error) {
   console.error(`dsh-openai-codex: ${safeMessage(error)}`);
